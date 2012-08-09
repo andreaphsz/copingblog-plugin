@@ -79,4 +79,16 @@ function my_enqueue($hook) {
 
 add_action( 'admin_enqueue_scripts', 'my_enqueue' );
 
-?>
+// redirect to primary blog
+function redirect_to_primary_blog()  {
+	if(!is_site_admin()){
+   	global $current_user;
+	get_currentuserinfo();
+	$blog_details = get_blog_details(get_usermeta($current_user->ID,'primary_blog'));
+	if($_SERVER['HTTP_HOST'] != $blog_details->domain){
+		header( 'Location: http://'.$blog_details->domain.'/wp-admin/&#39;' ) ;
+	}
+	}
+}
+
+//add_action('admin_init', 'redirect_to_primary_blog');
