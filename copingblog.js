@@ -7,6 +7,9 @@ function display_visi()
 	{
 		x.style.border = "solid red 2px"
 		document.getElementById("password-span").style.color = "red"
+		document.getElementById("post_password").style.color = "red"
+		document.getElementById("post_password").style.fontWeight = "bold"
+		
 	}
 }
 
