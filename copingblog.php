@@ -39,3 +39,10 @@ function my_enqueue($hook) {
 
 add_action( 'admin_enqueue_scripts', 'my_enqueue', 10, 1 );
 
+function my_login_redirect($redirect_to, $request, $user){
+	$current_user_blog = get_active_blog_for_user($user->ID);
+	$redirect_to = $current_user_blog->siteurl;
+
+    return $redirect_to;
+}
+add_filter("login_redirect", "my_login_redirect", 10, 3);
