@@ -9,6 +9,8 @@ Author URI: http://schwyz.phz.ch
 License: GPL2
 */
 
+add_action('save_post','set_visibility', 10, 2);
+
 function set_visibility($post_ID, $post)
 {
 	global $wpdb;
@@ -26,9 +28,7 @@ function set_visibility($post_ID, $post)
 	}
 }
 
-add_action('save_post','set_visibility', 10, 2);
-
-
+add_action( 'admin_enqueue_scripts', 'my_enqueue', 10, 1 );
 
 function my_enqueue($hook) {
     if( 'post-new.php' != $hook && 'post.php' != $hook)
@@ -37,7 +37,7 @@ function my_enqueue($hook) {
 
 }
 
-add_action( 'admin_enqueue_scripts', 'my_enqueue', 10, 1 );
+//add_filter("login_redirect", "my_login_redirect", 10, 3);
 
 function my_login_redirect($redirect_to, $request, $user){
 	$current_user_blog = get_active_blog_for_user($user->ID);
@@ -45,4 +45,15 @@ function my_login_redirect($redirect_to, $request, $user){
 
     return $redirect_to;
 }
-add_filter("login_redirect", "my_login_redirect", 10, 3);
+
+
+//add_action( 'login_enqueue_scripts', 'dp_redir_login' );
+
+function dp_redir_login() {
+	if( $_GET['action']=="")
+	{ 
+		wp_redirect('/');
+	 	exit;
+	}
+}
+
