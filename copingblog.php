@@ -14,15 +14,32 @@ add_filter('default_content', 'cb_editor_content');
 function cb_editor_content( $content ) {
 	
 	$new_ps = isset($_GET["new_ps"]) ? $_GET["new_ps"] : false;
-	
 	if ($new_ps != false) {
-		$content = "Datum: <br> Zielebene: <br> Konsequenzen: <br>  [Formular Feinplanung hier hochladen] <br> [Passwort für Mentor anpassen]" ;
+		$content = "Datum: <br> Zielebene: <br> Konsequenzen: <br>" ;
 	}
 	
 	$new_refl = isset($_GET["new_reflexion"]) ? $_GET["new_reflexion"] : false;
-	
-	if ($new_refl) {
-		$content = "Datum: <br> [Passwort für Kommilitone anpassen]" ;
+	if ($new_refl != false) {
+		$group_type = get_site_option( 'cb_group_type' );
+		if ($group_type=="ef") {
+			$content = '<img class="aligncenter size-full wp-image-306" alt="test3" src="wp-content/plugins/copingblog/templates/tasks_ef.png" width="556" height="500" />';
+			$content .= "1) Situationsbeschreibung <br>";
+			$content .= "2) Denkweisen ausprobieren <br>";
+			$content .= "3) Neue Situationsbewertung <br>";
+		}
+		if ($group_type=="pf") {
+			$content = '<img class="aligncenter size-full wp-image-306" alt="test3" src="wp-content/plugins/copingblog/templates/tasks_pf.png" width="531" height="518" />';
+			$content .= "1) Problemanalyse <br>";
+			$content .= "2) Ideensammlung <br>";
+			$content .= "3) Problemlösestrategie <br>";
+		}
+		if ($new_refl == "pwd") $content .= "[Passwort für Kommilitone anpassen]" ;
+		
+	}
+
+	$new_feinpl = isset($_GET["new_feinplanung"]) ? $_GET["new_feinplanung"] : false;
+	if ($new_feinpl) {
+		$content = "[Formular Feinplanung als PDF hier hochladen]  <br> [Passwort für Mentor anpassen]";
 	}
 	
 	return $content;
@@ -32,36 +49,52 @@ add_filter('default_title', 'cb_editor_title');
 
 function cb_editor_title() {
 	$new_ps = isset($_GET["new_ps"]) ? $_GET["new_ps"] : false;
-	
 	if ($new_ps != false) {
 		return strtoupper($new_ps) . ": Titel";
 	}
 	
 	$new_refl = isset($_GET["new_reflexion"]) ? $_GET["new_reflexion"] : false;
-	
-	if ($new_refl) {
+	if ($new_refl != false) {
 		return "Reflexion: Titel";
 	}
+
+	$new_feinpl = isset($_GET["new_feinplanung"]) ? $_GET["new_feinplanung"] : false;
+	if ($new_feinpl) {
+		return "Feinplanung: Titel";
+	}
+	
+	
 }
 
 add_action('save_post', 'cb_save_post');
 
 function cb_save_post( $post_id ){
 	$new_ps = isset($_GET["new_ps"]) ? $_GET["new_ps"] : false;
-	
 	if ($new_ps != false) {
 		$ps = get_cat_ID( $new_ps );
 		wp_set_post_categories( $post_id, array($ps));
-		cb_update_post($post_id, array( 'post_password' => 'for_my_mentor_'.rand(1000,9999), 'ID' => $post_id ) );
+		cb_update_post($post_id, array( 'post_password' => 'for_my_mentor_'.rand(1000,9999), 'ID' => $post_id ));
 	}
 	
 	$new_refl = isset($_GET["new_reflexion"]) ? $_GET["new_reflexion"] : false;
-	
 	if ($new_refl) {
 		$refl = get_cat_ID( 'Reflexion' );
 		wp_set_post_categories( $post_id, array($refl));
-		cb_update_post($post_id, array( 'post_password' => 'for_my_fellow_'.rand(1000,9999), 'ID' => $post_id ) );
+		if($new_refl == "pwd") {
+			cb_update_post($post_id, array( 'post_password' => 'for_my_fellow_'.rand(1000,9999), 'ID' => $post_id ));
+		}
+		if($new_refl == "private") {
+			cb_update_post($post_id, array( 'post_status' => 'private', 'ID' => $post_id ));
+		}
 	}
+	
+	$new_feinpl = isset($_GET["new_feinplanung"]) ? $_GET["new_feinplanung"] : false;
+	if ($new_feinpl) {
+		$feinpl = get_cat_ID( 'Feinplanung' );
+		wp_set_post_categories( $post_id, array($feinpl));
+		cb_update_post($post_id, array( 'post_password' => 'for_my_mentor_'.rand(1000,9999), 'ID' => $post_id ));
+	}
+	
 }
 
 function cb_update_post($post_ID, $data) {
@@ -90,8 +123,16 @@ function cb_update_post($post_ID, $data) {
 
 function cb_display_feinplanung() {
 	echo "<h2>Feinplanung</h2>";
-	echo "<a href='#'>Formular herunterladen</a><br><br>";
+	echo "<a href='../wp-content/plugins/copingblog/templates/phsz_feinplanungsraster_fachpraktikum_ohne_ref_ps.docx'>Formular herunterladen</a> | ";
 	
+	$cat_ids =  get_cat_ID('Feinplanung');
+	$ps_count = get_categories( array('include'=> $cat_ids) ); 
+	
+	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Feinplanung' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
+	echo "<a href='post-new.php?new_feinplanung=true'>neu</a><br><br>";
+}
+
+function cb_display_reflexionps() {
 	echo "<h2>Reflexion PS</h2>";
 
 	$cat_ids = array();
@@ -167,13 +208,27 @@ function cb_display_feinplanung() {
 
 function cb_display_reflexion() {
 	echo "<h2>Reflexion</h2>";
+	if( 1==1 ) { 
+		echo "<div><ol>";
+		echo "<li>".CB_EF_REFLEXION_HTML_1."</li>";
+		echo "<li>".CB_EF_REFLEXION_HTML_2."</li>";
+		echo "<li>".CB_EF_REFLEXION_HTML_3."</li>";
+		echo "<li>".CB_EF_REFLEXION_HTML_4."</li>";
+		echo "</ol></div>";
+	}else{	
+		echo "<div><ol>";
+		echo "<li>".CB_PF_REFLEXION_HTML_1."</li>";
+		echo "<li>".CB_PF_REFLEXION_HTML_2."</li>";	
+		echo "<li>".CB_PF_REFLEXION_HTML_3."</li>";		
+		echo "<li>".CB_PF_REFLEXION_HTML_4."</li>";
+		echo "</ol></div>";
+	}
 	
 	$cat_ids =  get_cat_ID('Reflexion');
 	$ps_count = get_categories( array('include'=> $cat_ids) ); 
 	
 	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Reflexion' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_reflexion=true'>neu</a><br><br>";
-	
+	echo "<a href='post-new.php?new_reflexion=pwd'>neu (mit Passwort)</a> | <a href='post-new.php?new_reflexion=private'>neu (privat)</a><br><br>";
 }
 
 function cb_display_evaluation() {
@@ -188,7 +243,8 @@ function cb_menu_copingblog() {
 	if(isset($menu_blogpr) && $menu_blogpr==1) {
 		add_menu_page("Blogging Tool", "Blogging Tool", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung');
 		add_submenu_page( "feinplanung_menu", "Feinplanung", "Feinplanung", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung');
-		add_submenu_page( "feinplanung_menu", "Reflexion", "Reflexion", "edit_posts", "reflexion_menu", 'cb_display_reflexion');
+		add_submenu_page( "feinplanung_menu", "Reflexion PS", "Reflexion PS", "edit_posts", "reflexionps_menu", 'cb_display_reflexionps');
+		if (get_site_option('cb_group_type') != 'ctrl') add_submenu_page( "feinplanung_menu", "Reflexion", "Reflexion", "edit_posts", "reflexion_menu", 'cb_display_reflexion');
 		add_submenu_page( "feinplanung_menu", "Evaluation", "Evaluation", "edit_posts", "evaluation_menu", 'cb_display_evaluation');
 	}
 
@@ -197,7 +253,7 @@ function cb_menu_copingblog() {
 add_action('update_wpmu_options', 'cb_update_options');
 
 function cb_update_options() {
-	$options = array('cb_menu_tumblr', 'cb_menu_blogpr');
+	$options = array('cb_menu_tumblr', 'cb_menu_blogpr', 'cb_group_type');
 	foreach($options as $option_name) {
 		$value = wp_unslash( $_POST[$option_name] );
 		update_site_option( $option_name, $value );		
@@ -228,15 +284,29 @@ function cb_network_plugin_settings() {
 		?>
 			</td>
 		</tr>
+		<tr valign="top">
+			<th scope="row"><?php _e( 'Group type' ) ?></th>
+			<?php
+			if ( !get_site_option( 'cb_group_type' ) )
+				update_site_option( 'cb_group_type', 'ef' );
+			$reg = get_site_option( 'cb_group_type' );
+			?>
+			<td>
+				<label><input name="cb_group_type" type="radio" id="cb_group_type_1" value="ef"<?php checked( $reg, 'ef') ?> /> <?php _e( 'Emotion focused group' ); ?></label><br />
+				<label><input name="cb_group_type" type="radio" id="cb_group_type_2" value="pf"<?php checked( $reg, 'pf') ?> /> <?php _e( 'Problem focused group' ); ?></label><br />
+				<label><input name="cb_group_type" type="radio" id="cb_group_type_3" value="ctrl"<?php checked( $reg, 'ctrl') ?> /> <?php _e( 'Control group' ); ?></label><br />
+			</td>
+		</tr>
+
 	</table>
 	<?php
 }
 
-add_action('save_post','cb_set_visibility', 10, 2);
+add_action('save_post','cb_set_visibility', 10, 1);
 
-function cb_set_visibility($post_ID, $post)
+function cb_set_visibility($post_ID)
 {
-	global $wpdb;
+	//global $wpdb;
 	/*
 	$form = isset($_GET["form"]) ? $_GET["form"] : "";
 	
@@ -295,9 +365,43 @@ function cb_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
 	}
 
 	wp_create_category( 'Reflexion' );
+	
+	wp_create_category( 'Feinplanung' );
 
 	// Restore to the current blog
 	restore_current_blog();
+}
+
+add_action( 'init', 'cb_init' );
+
+function cb_init() {
+	if ( !defined( 'CB_EF_REFLEXION_HTML_1' ) )     define( 'CB_EF_REFLEXION_HTML_1', "<strong>Situationsbeschreibung</strong> <br> Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, wie Sie über diese Situation denken und welche Bedeutung sie für Sie hat. <br> (Dabei kann es sich um eine für Sie besonders stressige Ausnahmesituation handeln oder um eine alltägliche Kleinigkeit)." );
+	
+	if ( !defined( 'CB_EF_REFLEXION_HTML_2' ) )     define( 'CB_EF_REFLEXION_HTML_2', "<strong>Denkweisen ausprobieren</strong> <br> Überlegen Sie anhand der folgenden Leitfragen, wie Sie auch über die Situation denken könnten und schreiben Sie das auf: <br>
+	a. Ist es wirklich so oder gibt es auch andere Möglichkeiten die Situation zu sehen?<br>
+	b. Was ist das Gute an dieser Situation und was kann ich daraus lernen?<br>
+	c. Welche Stärken und Ressourcen habe ich, die mir in dieser Situation helfen?<br>
+	d. Wie werde ich darüber denken, wenn ich mehr Distanz zur Situation bekomme? (z.B. in einem Jahr)<br>");
+
+	if ( !defined( 'CB_EF_REFLEXION_HTML_3' ) )     define( 'CB_EF_REFLEXION_HTML_3', "<strong>Neue Situationsbewertung</strong> <br> 
+Formulieren Sie eine für Sie förderliche Denkweise, die Ihnen hilft, mit der Situation in positiver Weise umzugehen. Formulieren Sie Ihre Denkweise möglichst kurz und einfach, persönlich und in der Gegenwart.");
+
+	if ( !defined( 'CB_EF_REFLEXION_HTML_4' ) )     define( 'CB_EF_REFLEXION_HTML_4', "<i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie Sie deren/dessen geschilderte Denkweisen und Situationsbewertungen einschätzen. Achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i>");
+	
+	if ( !defined( 'CB_PF_REFLEXION_HTML_1' ) )     define( 'CB_EF_REFLEXION_HTML_1', "<li><strong>Problemanalyse</strong> <br>
+		Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, welche Gründe zu dieser Situation geführt haben. <br> (Dabei kann es sich um eine für Sie besonders stressige Ausnahmesituation handeln oder um eine alltägliche Kleinigkeit).</li>");
+
+	if ( !defined( 'CB_PF_REFLEXION_HTML_2' ) )     define( 'CB_EF_REFLEXION_HTML_2', "<li><strong>Ideensammlung</strong> <br>
+Überlegen Sie anhand der folgenden Leitfragen, wie Sie die geschilderte Herausforderung künftig vermeiden, verändern, bewältigen könnten und schreiben Sie das stichwortartig auf: <br>
+	a.	Auf welche Aspekte der Situation habe ich Einfluss und auf welche nicht? <br>
+	b.	Welche Aspekte sind wichtiger und welche sind weniger entscheidend? <br>
+	c.	Welche Bedingungen kann ich im Vorfeld dieser Situation beeinflussen? <br>
+	d.	Welche Verhaltensmöglichkeiten habe ich, wenn die Situation akut auftritt?</li>");
+
+	if ( !defined( 'CB_PF_REFLEXION_HTML_3' ) )     define( 'CB_EF_REFLEXION_HTML_3', "<li><strong>Problemlösestrategie</strong> <br>
+Skizzieren Sie einen für Sie passenden Plan zur Lösung des Problems; nennen Sie dazu Ihre konkreten Handlungsschritte. Notiere Sie auch die Konsequenzen, die Sie von Ihrem Plan erwarten, wenn die Situation erneut auftreten sollte. </li>");
+
+	if ( !defined( 'CB_PF_REFLEXION_HTML_4' ) )     define( 'CB_EF_REFLEXION_HTML_4', "<li><i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie gut Sie die Chancen einschätzen, mit der geschilderten Problemanalyse und Problemlösestrategie Erfolg zu haben. Geben Sie Hinweise, was man noch tun könnte und achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i></li>");
 }
 
 register_activation_hook( __FILE__, 'cb_plugin_activate' );
@@ -306,6 +410,7 @@ function cb_plugin_activate() {
 
 	add_site_option( 'cb_menu_tumblr', '1' );
 	add_site_option( 'cb_menu_blogpr', '' );
+	add_site_option( 'cb_group_type', 'ef' );
 }
 
 
