@@ -9,6 +9,15 @@ Author URI: http://schwyz.phz.ch
 License: GPL2
 */
 
+function cb_get_user_experimental_group() {
+    global $wpdb, $user_email;
+    get_currentuserinfo();
+
+	$group = $wpdb->get_row("SELECT * FROM cb_students WHERE email='$user_email' ", ARRAY_A);
+
+	return $group['group'];
+}
+
 add_filter('default_content', 'cb_editor_content');
 
 function cb_editor_content( $content ) {
@@ -20,15 +29,22 @@ function cb_editor_content( $content ) {
 	
 	$new_refl = isset($_GET["new_reflexion"]) ? $_GET["new_reflexion"] : false;
 	if ($new_refl != false) {
-		$group_type = get_site_option( 'cb_group_type' );
-		if ($group_type=="ef") {
-			$content = '<img class="aligncenter size-full wp-image-306" alt="test3" src="wp-content/plugins/copingblog/templates/tasks_ef.png" width="556" height="500" />';
+		$group_type = cb_get_user_experimental_group();
+		$img_1 = '<img class="aligncenter size-full wp-image-306" alt="cb-reflexion" src="' . CB_PLUGIN_URL . '/'.'templates/';
+		$img_2 = array(
+			CB_GROUP_EF    => 'ef.png"  style="max-width:100% !important;" />',
+			CB_GROUP_EF_FB => 'ef_fb.png" style="max-width:100% !important;" />',
+			CB_GROUP_PF    => 'pf.png"    style="max-width:100% !important;" />',
+			CB_GROUP_PF_FB => 'pf_fb.png"  style="max-width:100% !important;" />'			
+		);
+		if ($group_type == CB_GROUP_EF || $group_type == CB_GROUP_EF_FB) {
+			$content  = $img_1 . $img_2[$group_type];
 			$content .= "1) Situationsbeschreibung <br>";
 			$content .= "2) Denkweisen ausprobieren <br>";
 			$content .= "3) Neue Situationsbewertung <br>";
 		}
-		if ($group_type=="pf") {
-			$content = '<img class="aligncenter size-full wp-image-306" alt="test3" src="wp-content/plugins/copingblog/templates/tasks_pf.png" width="531" height="518" />';
+		if ($group_type == CB_GROUP_PF || $group_type == CB_GROUP_PF_FB) {
+			$content  = $img_1 . $img_2[$group_type];			
 			$content .= "1) Problemanalyse <br>";
 			$content .= "2) Ideensammlung <br>";
 			$content .= "3) Problemlösestrategie <br>";
@@ -122,7 +138,7 @@ function cb_update_post($post_ID, $data) {
 }
 
 function cb_display_feinplanung() {
-	echo "<h2>Feinplanung</h2>";
+	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_119_table.png">'.' Feinplanung</h2>';
 	echo "<a href='../wp-content/plugins/copingblog/templates/phsz_feinplanungsraster_fachpraktikum_ohne_ref_ps.docx'>Formular herunterladen</a> | ";
 	
 	$cat_ids =  get_cat_ID('Feinplanung');
@@ -133,7 +149,7 @@ function cb_display_feinplanung() {
 }
 
 function cb_display_reflexionps() {
-	echo "<h2>Reflexion PS</h2>";
+	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_082_roundabout.png">'.' Reflexion PS</h2>';
 
 	$cat_ids = array();
 	for ($i=0; $i<9; $i++) { 
@@ -207,20 +223,23 @@ function cb_display_reflexionps() {
 } //end cb_display_feinplanung
 
 function cb_display_reflexion() {
-	echo "<h2>Reflexion</h2>";
-	if( 1==1 ) { 
+	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_080_retweet.png">'.' Reflexion</h2>';
+	if ( cb_get_user_experimental_group() == CB_GROUP_EF || 
+		 cb_get_user_experimental_group() == CB_GROUP_EF_FB ) { 
 		echo "<div><ol>";
 		echo "<li>".CB_EF_REFLEXION_HTML_1."</li>";
 		echo "<li>".CB_EF_REFLEXION_HTML_2."</li>";
 		echo "<li>".CB_EF_REFLEXION_HTML_3."</li>";
-		echo "<li>".CB_EF_REFLEXION_HTML_4."</li>";
+		if (cb_get_user_experimental_group() == CB_GROUP_EF_FB) echo "<li>".CB_EF_REFLEXION_HTML_4."</li>";
 		echo "</ol></div>";
-	}else{	
+	}
+	if ( cb_get_user_experimental_group() == CB_GROUP_PF  || 
+ 	 	 cb_get_user_experimental_group() == CB_GROUP_PF_FB ) { 
 		echo "<div><ol>";
 		echo "<li>".CB_PF_REFLEXION_HTML_1."</li>";
 		echo "<li>".CB_PF_REFLEXION_HTML_2."</li>";	
 		echo "<li>".CB_PF_REFLEXION_HTML_3."</li>";		
-		echo "<li>".CB_PF_REFLEXION_HTML_4."</li>";
+		if (cb_get_user_experimental_group() == CB_GROUP_PF_FB) echo "<li>".CB_PF_REFLEXION_HTML_4."</li>";
 		echo "</ol></div>";
 	}
 	
@@ -232,7 +251,7 @@ function cb_display_reflexion() {
 }
 
 function cb_display_evaluation() {
-	echo "<h2>Evaluation</h2>";
+	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_041_charts.png">'.' Evaluation</h2>';
 	echo "<a href='http://fragebogen.blogpraktikum.ch' target=_blank>Link zum Fragebogen</a>";
 }
 
@@ -241,10 +260,10 @@ add_action('admin_menu', 'cb_menu_copingblog');
 function cb_menu_copingblog() {
 	$menu_blogpr = get_site_option( 'cb_menu_blogpr' );
 	if(isset($menu_blogpr) && $menu_blogpr==1) {
-		add_menu_page("Blogging Tool", "Blogging Tool", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung');
+		add_menu_page("Blogging Tool", "Blogging Tool", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung', CB_PLUGIN_URL.'/'.'icons/glyphicons_330_blog_invers.png');
 		add_submenu_page( "feinplanung_menu", "Feinplanung", "Feinplanung", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung');
 		add_submenu_page( "feinplanung_menu", "Reflexion PS", "Reflexion PS", "edit_posts", "reflexionps_menu", 'cb_display_reflexionps');
-		if (get_site_option('cb_group_type') != 'ctrl') add_submenu_page( "feinplanung_menu", "Reflexion", "Reflexion", "edit_posts", "reflexion_menu", 'cb_display_reflexion');
+		if (cb_get_user_experimental_group() != CB_GROUP_CTRL) add_submenu_page( "feinplanung_menu", "Reflexion", "Reflexion", "edit_posts", "reflexion_menu", 'cb_display_reflexion');
 		add_submenu_page( "feinplanung_menu", "Evaluation", "Evaluation", "edit_posts", "evaluation_menu", 'cb_display_evaluation');
 	}
 
@@ -348,7 +367,7 @@ function cb_enqueue($hook) {
 
 }
 
-add_action( 'wpmu_new_blog', 'cb_new_blog', 10, 6);
+add_action( 'wpmu_new_blog', 'cb_new_blog', 1000, 6); //do it after set_blog_defaults
 
 function cb_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
 
@@ -368,6 +387,17 @@ function cb_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
 	
 	wp_create_category( 'Feinplanung' );
 
+	//sitebar categories widget active
+	delete_option('sidebars_widgets');
+/*	$sw = get_option('sidebars_widgets');
+	$sw['wp_inactive_widgets'] = $sw['sidebar-1'];
+	$sw['sidebar-1'] = array(0 => 'categories-3');
+	//unset($sw['wp_inactive_widgets'][array_keys($sw['wp_inactive_widgets'], 'categories-2')[0]]);
+	update_option('sidebars_widgets', $sw);
+	update_option( 'widget_categories', array ( 3 => array ( 'title' => '', 'count' => 1, 'hierarchical' => 0, 'dropdown' => 0 ), '_multiwidget' => 1 ) );
+	//update_option( 'sidebars_widgets', array ( 'wp_inactive_widgets' => array (), 'sidebar-1' => array ( 0 => 'search-2', 1 => 'recent-posts-2', 2 => 'recent-comments-2', 3 => 'archives-2', 4 => 'categories-2', 5 => 'meta-2', ), 'sidebar-2' => array (), 'sidebar-3' => array (), 'array_version' => 3 ) );
+*/	
+	
 	// Restore to the current blog
 	restore_current_blog();
 }
@@ -375,6 +405,14 @@ function cb_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
 add_action( 'init', 'cb_init' );
 
 function cb_init() {
+	if ( !defined( 'CB_GROUP_EF' ) )    define( 'CB_GROUP_EF', 'ef');
+	if ( !defined( 'CB_GROUP_EF_FB' ) ) define( 'CB_GROUP_EF_FB', 'ef_fb');
+	if ( !defined( 'CB_GROUP_PF' ) )    define( 'CB_GROUP_PF', 'pf');
+	if ( !defined( 'CB_GROUP_PF_FB' ) ) define( 'CB_GROUP_PF_FB', 'pf_fb');
+	if ( !defined( 'CB_GROUP_CTRL' ) )  define( 'CB_GROUP_CTRL', 'ctrl');
+	
+	if ( !defined( 'CB_PLUGIN_URL' ) )  define( 'CB_PLUGIN_URL', plugins_url( '', __FILE__ ) );
+	
 	if ( !defined( 'CB_EF_REFLEXION_HTML_1' ) )     define( 'CB_EF_REFLEXION_HTML_1', "<strong>Situationsbeschreibung</strong> <br> Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, wie Sie über diese Situation denken und welche Bedeutung sie für Sie hat. <br> (Dabei kann es sich um eine für Sie besonders stressige Ausnahmesituation handeln oder um eine alltägliche Kleinigkeit)." );
 	
 	if ( !defined( 'CB_EF_REFLEXION_HTML_2' ) )     define( 'CB_EF_REFLEXION_HTML_2', "<strong>Denkweisen ausprobieren</strong> <br> Überlegen Sie anhand der folgenden Leitfragen, wie Sie auch über die Situation denken könnten und schreiben Sie das auf: <br>
@@ -388,20 +426,20 @@ Formulieren Sie eine für Sie förderliche Denkweise, die Ihnen hilft, mit der S
 
 	if ( !defined( 'CB_EF_REFLEXION_HTML_4' ) )     define( 'CB_EF_REFLEXION_HTML_4', "<i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie Sie deren/dessen geschilderte Denkweisen und Situationsbewertungen einschätzen. Achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i>");
 	
-	if ( !defined( 'CB_PF_REFLEXION_HTML_1' ) )     define( 'CB_EF_REFLEXION_HTML_1', "<li><strong>Problemanalyse</strong> <br>
-		Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, welche Gründe zu dieser Situation geführt haben. <br> (Dabei kann es sich um eine für Sie besonders stressige Ausnahmesituation handeln oder um eine alltägliche Kleinigkeit).</li>");
+	if ( !defined( 'CB_PF_REFLEXION_HTML_1' ) )     define( 'CB_PF_REFLEXION_HTML_1', "<strong>Problemanalyse</strong> <br>
+		Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, welche Gründe zu dieser Situation geführt haben. <br> (Dabei kann es sich um eine für Sie besonders stressige Ausnahmesituation handeln oder um eine alltägliche Kleinigkeit).");
 
-	if ( !defined( 'CB_PF_REFLEXION_HTML_2' ) )     define( 'CB_EF_REFLEXION_HTML_2', "<li><strong>Ideensammlung</strong> <br>
+	if ( !defined( 'CB_PF_REFLEXION_HTML_2' ) )     define( 'CB_PF_REFLEXION_HTML_2', "<strong>Ideensammlung</strong> <br>
 Überlegen Sie anhand der folgenden Leitfragen, wie Sie die geschilderte Herausforderung künftig vermeiden, verändern, bewältigen könnten und schreiben Sie das stichwortartig auf: <br>
 	a.	Auf welche Aspekte der Situation habe ich Einfluss und auf welche nicht? <br>
 	b.	Welche Aspekte sind wichtiger und welche sind weniger entscheidend? <br>
 	c.	Welche Bedingungen kann ich im Vorfeld dieser Situation beeinflussen? <br>
-	d.	Welche Verhaltensmöglichkeiten habe ich, wenn die Situation akut auftritt?</li>");
+	d.	Welche Verhaltensmöglichkeiten habe ich, wenn die Situation akut auftritt?");
 
-	if ( !defined( 'CB_PF_REFLEXION_HTML_3' ) )     define( 'CB_EF_REFLEXION_HTML_3', "<li><strong>Problemlösestrategie</strong> <br>
-Skizzieren Sie einen für Sie passenden Plan zur Lösung des Problems; nennen Sie dazu Ihre konkreten Handlungsschritte. Notiere Sie auch die Konsequenzen, die Sie von Ihrem Plan erwarten, wenn die Situation erneut auftreten sollte. </li>");
+	if ( !defined( 'CB_PF_REFLEXION_HTML_3' ) )     define( 'CB_PF_REFLEXION_HTML_3', "<strong>Problemlösestrategie</strong> <br>
+Skizzieren Sie einen für Sie passenden Plan zur Lösung des Problems; nennen Sie dazu Ihre konkreten Handlungsschritte. Notiere Sie auch die Konsequenzen, die Sie von Ihrem Plan erwarten, wenn die Situation erneut auftreten sollte.");
 
-	if ( !defined( 'CB_PF_REFLEXION_HTML_4' ) )     define( 'CB_EF_REFLEXION_HTML_4', "<li><i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie gut Sie die Chancen einschätzen, mit der geschilderten Problemanalyse und Problemlösestrategie Erfolg zu haben. Geben Sie Hinweise, was man noch tun könnte und achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i></li>");
+	if ( !defined( 'CB_PF_REFLEXION_HTML_4' ) )     define( 'CB_PF_REFLEXION_HTML_4', "<i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie gut Sie die Chancen einschätzen, mit der geschilderten Problemanalyse und Problemlösestrategie Erfolg zu haben. Geben Sie Hinweise, was man noch tun könnte und achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i>");
 }
 
 register_activation_hook( __FILE__, 'cb_plugin_activate' );
