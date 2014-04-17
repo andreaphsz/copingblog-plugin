@@ -32,10 +32,10 @@ function cb_editor_content( $content ) {
 		$group_type = cb_get_user_experimental_group();
 		$img_1 = '<img class="aligncenter size-full wp-image-306" alt="cb-reflexion" src="' . CB_PLUGIN_URL . '/'.'templates/';
 		$img_2 = array(
-			CB_GROUP_EF    => 'ef.png"  style="max-width:100% !important;" />',
-			CB_GROUP_EF_FB => 'ef_fb.png" style="max-width:100% !important;" />',
-			CB_GROUP_PF    => 'pf.png"    style="max-width:100% !important;" />',
-			CB_GROUP_PF_FB => 'pf_fb.png"  style="max-width:100% !important;" />'			
+			CB_GROUP_EF    => 'ef.png" />',
+			CB_GROUP_EF_FB => 'ef_fb.png" />',
+			CB_GROUP_PF    => 'pf.png"  />',
+			CB_GROUP_PF_FB => 'pf_fb.png"  />'			
 		);
 		if ($group_type == CB_GROUP_EF || $group_type == CB_GROUP_EF_FB) {
 			$content  = $img_1 . $img_2[$group_type];
@@ -157,89 +157,68 @@ function cb_display_reflexionps() {
 	}
 	$ps_count = get_categories( array('include'=> implode($cat_ids,",")) );
 		
-	echo "<h3>PS 1 versteht und vermittelt Fachinhalte</h3>";
-	echo "<div>Die Lehrperson verfügt über fachwissenschaftliches und fachdidaktisches Wissen, versteht die Inhalte, Strukturen und zentralen Forschungsmethoden ihrer Fachbereiche und sie kann Lern- situationen schaffen, die die fachwissenschaftlichen und fachdidaktischen Aspekte für die Lernenden bedeutsam machen. <br>
-&nbsp;&nbsp;1.3 erkennt Zusammenhänge zwischen verschiedenen Fachbereichen (Niveau 1) <br>
-&nbsp;&nbsp;1.4 wählt Ziele und Inhalte erziehungs- und gesellschaftswissenschaftlich begründbar aus
-(Niveau 1)</div>";
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS1' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
+	$pre = array();
+	for ($i=0; $i<9; $i++) {
+		$i_1 = $i+1;
+		$pre[$i] = '<a href="edit.php?post_status=all&post_type=post&cat='.
+			get_cat_ID( "PS".$i_1 ) . '&paged=1&mode=excerpt" title="anzeigen"><img src="' .
+			CB_PLUGIN_URL.'/'.'icons/glyphicons_195_circle_info_small.png"></a>&nbsp;';
 
-	echo "<a href='post-new.php?new_ps=ps1'>neu</a><br><br>";
+		$pre[$i] .= "<a href=\"post-new.php?new_ps=ps$i_1\" title=\"neu\"><img src=\"" . 
+			CB_PLUGIN_URL.'/'."icons/glyphicons_190_circle_plus_small.png\"></a>&nbsp;&nbsp;";
+	}
+	echo "<br>";
+	echo "<h3>".$pre[0];
+	echo "PS 1 versteht und vermittelt Fachinhalte [".(isset($ps_count[0]) ? $ps_count[0]->count : 0)."]</h3>";
+	echo "<div>".CB_PS1_HTML."</div>";
 	
-	echo "<h3>PS 2 versteht und unterstützt Entwicklungsprozesse</h3>";
-	echo "<div>Die Lehrperson versteht, wie Kinder und Erwachsene lernen und sich entwickeln, und sie kann Lerngelegenheiten und Lernwege anbieten, welche die kognitive, soziale und persönliche Entwicklung unterstützen. <br>
-&nbsp;&nbsp;2.2 aktiviert Erfahrungen und Wissen (Niveau 2) <br>
-&nbsp;&nbsp;2.5 fördert selbstgesteuertes Lernen (Niveau 2)</div>";
+	echo "<br><h3>".$pre[1];	
+	echo "PS 2 versteht und unterstützt Entwicklungsprozesse [".(isset($ps_count[1]) ? $ps_count[1]->count : 0)."]</h3>";
+	echo "<div>".CB_PS2_HTML."</div>";
 
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS2' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[1]) ? $ps_count[1]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_ps=ps2'>neu</a><br><br>";
+	echo "<br><h3>".$pre[2];
+	echo "PS 3 versteht und berücksichtigt Unterschiede im Lernen [".(isset($ps_count[2]) ? $ps_count[2]->count : 0)."]</h3>";
+	echo "<div>".CB_PS3_HTML."</div>";
 
-	echo "<h3>PS 3 versteht und berücksichtigt Unterschiede im Lernen
-</h3>";
-	echo "<div>Die Lehrperson versteht, wie verschieden die Wege zum Lernen sind und schafft Unterrichtssituationen, die auf die Lernenden individuell angepasst sind. <br>
-&nbsp;&nbsp;3.4 begünstigt eigenständiges Lernen (Niveau 2)</div>";
+	echo "<br><h3>".$pre[4];
+	echo "PS 5 motiviert und leitet an[".(isset($ps_count[4]) ? $ps_count[4]->count : 0)."]</h3>";
+	echo "<div>".CB_PS5_HTML."</div>";
 
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS3' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[2]) ? $ps_count[2]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_ps=ps3'>neu</a><br><br>";
-	
-	echo "<h3>PS 5 motiviert und leitet an</h3>";
-	echo "<div>Die Lehrperson setzt ihr Verständnis über Motivationsprozesse und Klassenmanagement ge- zielt ein, um Lernsituationen zu schaffen, die die positive soziale Zusammenarbeit der Kinder und Jugendlichen fördert und selbstgesteuertes Lernen zulassen. <br>
-&nbsp;&nbsp;5.4 setzt Verhaltenserwartungen, fordert diese ein und fördert sozial erwünschtes Verhalten und das Klassenklima (Niveau 1) <br>
-&nbsp;&nbsp;5.5 fördert soziale Zusammenarbeit (Niveau 1)</div>";
+	echo "<br><h3>".$pre[5];
+	echo "PS 6 kommuniziert und moderiert[".(isset($ps_count[5]) ? $ps_count[5]->count : 0)."]</h3>";
+	echo "<div>".CB_PS6_HTML."</div>";
 
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS5' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[4]) ? $ps_count[4]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_ps=ps5'>neu</a><br><br>";
-	
-	echo "<h3>PS 6 kommuniziert und moderiert</h3>";
-	echo "<div>Die Lehrperson verwendet ihr Wissen von effektiven verbalen und nicht verbalen Kommunikati- ons- und Medienformen, um aktives Lernen, Mitarbeit und den gegenseitigen Austausch im Klassenzimmer zu fördern. <br>
-&nbsp;&nbsp;6.3 fördert die Diskussionskultur (Niveau 1) <br> </div>";
+	echo "<br><h3>".$pre[6];
+	echo "PS 7 plant und evaluiert[".(isset($ps_count[6]) ? $ps_count[6]->count : 0)."]</h3>";
+	echo "<div>".CB_PS7_HTML."</div>";
 
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS6' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[5]) ? $ps_count[5]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_ps=ps6'>neu</a><br><br>";
-	
-	echo "<h3>PS 7 plant und evaluiert</h3>";
-	echo "<div>Die Lehrperson plant, realisiert und evaluiert ihren Unterricht auf Grund ihres Verständnisses vom Fachbereich, von Lehrplan und Leitideen der Schule, und auf der Basis des berufswissen- schaftlichen Hintergrundes. <br>
-&nbsp;&nbsp;7.1 setzt Leitideen und Lehrplan im Unterricht um (Niveau 1) <br>
-&nbsp;&nbsp;7.2 plant den Unterricht systematisch (Niveau 1) <br>
-&nbsp;&nbsp;7.3 passt den Unterricht situativ an (Niveau 1)</div>";
+	echo "<br><h3>".$pre[7];
+	echo "PS 8 beobachtet und fördert[".(isset($ps_count[7]) ? $ps_count[7]->count : 0)."]</h3>";
+	echo "<div>".CB_PS8_HTML."</div>";
 
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS7' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[6]) ? $ps_count[6]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_ps=ps7'>neu</a><br><br>";
-	
-	echo "<h3>PS 8 beobachtet und fördert</h3>";
-	echo "<div>Die Lehrperson versteht und verwendet gezielt unterschiedliche Beurteilungssysteme, um die kognitive, soziale und persönliche Entwicklung der Kinder und Jugendlichen fortlaufend einzuschätzen, zu sichern und zu fördern. <br>
-&nbsp;&nbsp;8.1 beurteilt und bewertet differenziert (Niveau 1)</div>";
-
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS8' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[7]) ? $ps_count[7]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_ps=ps8'>neu</a><br><br>";
-	
-	echo "<h3>PS 9 reflektiert ihre eigene Professionalität (Erfahrungen)</h3>";
-	echo "<div>Die Lehrperson reflektiert fortlaufend die Wirkung ihrer Entscheide und Tätigkeiten auf andere (Lernende, Eltern und auf andere Lehrende) und sie geht ihre professionelle Weiterentwicklung aktiv und verantwortungsbewusst an. <br>
-&nbsp;&nbsp;9.1 reflektiert und entwickelt den Unterricht (Niveau 1) </div>";
-
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'PS9' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[8]) ? $ps_count[8]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_ps=ps9'>neu</a><br><br>";
+	echo "<br><h3>".$pre[8];
+	echo "PS 9 reflektiert ihre eigene Professionalität (Erfahrungen)[".(isset($ps_count[8]) ? $ps_count[8]->count : 0)."]</h3>";
+	echo "<div>".CB_PS9_HTML."</div>";
 	
 } //end cb_display_feinplanung
 
 function cb_display_reflexion() {
 	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_080_retweet.png">'.' Reflexion</h2>';
-	if ( cb_get_user_experimental_group() == CB_GROUP_EF || 
-		 cb_get_user_experimental_group() == CB_GROUP_EF_FB ) { 
+	$group = cb_get_user_experimental_group();
+	if ( $group == CB_GROUP_EF || $group == CB_GROUP_EF_FB ) { 
 		echo "<div><ol>";
 		echo "<li>".CB_EF_REFLEXION_HTML_1."</li>";
 		echo "<li>".CB_EF_REFLEXION_HTML_2."</li>";
 		echo "<li>".CB_EF_REFLEXION_HTML_3."</li>";
-		if (cb_get_user_experimental_group() == CB_GROUP_EF_FB) echo "<li>".CB_EF_REFLEXION_HTML_4."</li>";
+		if ($group == CB_GROUP_EF_FB) echo "<li>".CB_EF_REFLEXION_HTML_4."</li>";
 		echo "</ol></div>";
 	}
-	if ( cb_get_user_experimental_group() == CB_GROUP_PF  || 
- 	 	 cb_get_user_experimental_group() == CB_GROUP_PF_FB ) { 
+	if ( $group == CB_GROUP_PF  ||  $group == CB_GROUP_PF_FB ) { 
 		echo "<div><ol>";
 		echo "<li>".CB_PF_REFLEXION_HTML_1."</li>";
 		echo "<li>".CB_PF_REFLEXION_HTML_2."</li>";	
 		echo "<li>".CB_PF_REFLEXION_HTML_3."</li>";		
-		if (cb_get_user_experimental_group() == CB_GROUP_PF_FB) echo "<li>".CB_PF_REFLEXION_HTML_4."</li>";
+		if ($group == CB_GROUP_PF_FB) echo "<li>".CB_PF_REFLEXION_HTML_4."</li>";
 		echo "</ol></div>";
 	}
 	
@@ -247,7 +226,7 @@ function cb_display_reflexion() {
 	$ps_count = get_categories( array('include'=> $cat_ids) ); 
 	
 	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Reflexion' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_reflexion=pwd'>neu (mit Passwort)</a> | <a href='post-new.php?new_reflexion=private'>neu (privat)</a><br><br>";
+	echo "<a href='post-new.php?new_reflexion=".($group==CB_GROUP_EF_FB ? "pwd" : "private")."'>neu</a><br><br>";
 }
 
 function cb_display_evaluation() {
@@ -440,6 +419,37 @@ Formulieren Sie eine für Sie förderliche Denkweise, die Ihnen hilft, mit der S
 Skizzieren Sie einen für Sie passenden Plan zur Lösung des Problems; nennen Sie dazu Ihre konkreten Handlungsschritte. Notiere Sie auch die Konsequenzen, die Sie von Ihrem Plan erwarten, wenn die Situation erneut auftreten sollte.");
 
 	if ( !defined( 'CB_PF_REFLEXION_HTML_4' ) )     define( 'CB_PF_REFLEXION_HTML_4', "<i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie gut Sie die Chancen einschätzen, mit der geschilderten Problemanalyse und Problemlösestrategie Erfolg zu haben. Geben Sie Hinweise, was man noch tun könnte und achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i>");
+
+	if ( !defined( 'CB_PS1_HTML' ) )     define( 'CB_PS1_HTML', 'Die Lehrperson verfügt über fachwissenschaftliches und fachdidaktisches Wissen, versteht die Inhalte, Strukturen und zentralen Forschungsmethoden ihrer Fachbereiche und sie kann Lern- situationen schaffen, die die fachwissenschaftlichen und fachdidaktischen Aspekte für die Lernenden bedeutsam machen. <br>
+	&nbsp;&nbsp;1.3 erkennt Zusammenhänge zwischen verschiedenen Fachbereichen (Niveau 1) <br>
+	&nbsp;&nbsp;1.4 wählt Ziele und Inhalte erziehungs- und gesellschaftswissenschaftlich begründbar aus
+	(Niveau 1)');
+
+	if ( !defined( 'CB_PS2_HTML' ) )     define( 'CB_PS2_HTML', 'Die Lehrperson versteht, wie Kinder und Erwachsene lernen und sich entwickeln, und sie kann Lerngelegenheiten und Lernwege anbieten, welche die kognitive, soziale und persönliche Entwicklung unterstützen. <br>
+	&nbsp;&nbsp;2.2 aktiviert Erfahrungen und Wissen (Niveau 2) <br>
+	&nbsp;&nbsp;2.5 fördert selbstgesteuertes Lernen (Niveau 2)');
+	
+	if ( !defined( 'CB_PS3_HTML' ) )     define( 'CB_PS3_HTML', 'Die Lehrperson versteht, wie verschieden die Wege zum Lernen sind und schafft Unterrichtssituationen, die auf die Lernenden individuell angepasst sind. <br>
+&nbsp;&nbsp;3.4 begünstigt eigenständiges Lernen (Niveau 2)');
+	
+	if ( !defined( 'CB_PS5_HTML' ) )     define( 'CB_PS5_HTML', 'Die Lehrperson setzt ihr Verständnis über Motivationsprozesse und Klassenmanagement ge- zielt ein, um Lernsituationen zu schaffen, die die positive soziale Zusammenarbeit der Kinder und Jugendlichen fördert und selbstgesteuertes Lernen zulassen. <br>
+&nbsp;&nbsp;5.4 setzt Verhaltenserwartungen, fordert diese ein und fördert sozial erwünschtes Verhalten und das Klassenklima (Niveau 1) <br>
+&nbsp;&nbsp;5.5 fördert soziale Zusammenarbeit (Niveau 1)');
+	
+	if ( !defined( 'CB_PS6_HTML' ) )     define( 'CB_PS6_HTML', 'Die Lehrperson verwendet ihr Wissen von effektiven verbalen und nicht verbalen Kommunikati- ons- und Medienformen, um aktives Lernen, Mitarbeit und den gegenseitigen Austausch im Klassenzimmer zu fördern. <br>
+&nbsp;&nbsp;6.3 fördert die Diskussionskultur (Niveau 1)');
+	
+	if ( !defined( 'CB_PS7_HTML' ) )     define( 'CB_PS7_HTML', 'Die Lehrperson plant, realisiert und evaluiert ihren Unterricht auf Grund ihres Verständnisses vom Fachbereich, von Lehrplan und Leitideen der Schule, und auf der Basis des berufswissen- schaftlichen Hintergrundes. <br>
+&nbsp;&nbsp;7.1 setzt Leitideen und Lehrplan im Unterricht um (Niveau 1) <br>
+&nbsp;&nbsp;7.2 plant den Unterricht systematisch (Niveau 1) <br>
+&nbsp;&nbsp;7.3 passt den Unterricht situativ an (Niveau 1)');
+	
+	if ( !defined( 'CB_PS8_HTML' ) )     define( 'CB_PS8_HTML', 'Die Lehrperson versteht und verwendet gezielt unterschiedliche Beurteilungssysteme, um die kognitive, soziale und persönliche Entwicklung der Kinder und Jugendlichen fortlaufend einzuschätzen, zu sichern und zu fördern. <br>
+&nbsp;&nbsp;8.1 beurteilt und bewertet differenziert (Niveau 1)');
+	
+	if ( !defined( 'CB_PS9_HTML' ) )     define( 'CB_PS9_HTML', 'Die Lehrperson reflektiert fortlaufend die Wirkung ihrer Entscheide und Tätigkeiten auf andere (Lernende, Eltern und auf andere Lehrende) und sie geht ihre professionelle Weiterentwicklung aktiv und verantwortungsbewusst an. <br>
+&nbsp;&nbsp;9.1 reflektiert und entwickelt den Unterricht (Niveau 1)');
+
 }
 
 register_activation_hook( __FILE__, 'cb_plugin_activate' );
