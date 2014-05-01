@@ -104,10 +104,11 @@ function cb_save_post( $post_id ){
 		}
 	}
 	
-	$new_feinpl = isset($_GET["new_feinplanung"]) ? $_GET["new_feinplanung"] : false;
-	if ($new_feinpl) {
-		$feinpl = get_cat_ID( 'Feinplanung' );
-		wp_set_post_categories( $post_id, array($feinpl));
+	$new_planung = isset($_GET["new_planung"]) ? $_GET["new_planung"] : false;
+	if ($new_planung) {
+		$cat = array('Feinplanung', 'Wochenplanung', 'Grobplanung');
+		$cat_id = get_cat_ID( $cat[$new_planung-1] );
+		wp_set_post_categories( $post_id, array($cat_id));
 		cb_update_post($post_id, array( 'post_password' => 'for_my_mentor_'.rand(1000,9999), 'ID' => $post_id ));
 	}
 	
@@ -138,14 +139,27 @@ function cb_update_post($post_ID, $data) {
 }
 
 function cb_display_feinplanung() {
-	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_119_table.png">'.' Feinplanung</h2>';
-	echo "<a href='../wp-content/plugins/copingblog/templates/phsz_feinplanungsraster_fachpraktikum_ohne_ref_ps.docx'>Formular herunterladen</a> | ";
-	
-	$cat_ids =  get_cat_ID('Feinplanung');
-	$ps_count = get_categories( array('include'=> $cat_ids) ); 
-	
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Feinplanung' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_feinplanung=true'>neu</a><br><br>";
+	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_119_table.png">'.' Planungsinstrumente</h2>';
+
+	$title = array('Feinplanung', 'Wochenplanung', 'Grobplanung');
+
+	$cat_ids = array();
+	for ($i=0; $i<3; $i++) $cat_ids[$i] =  get_cat_ID($title[$i]);
+
+	$ps_count = get_categories( array('include'=> implode($cat_ids,",")) ); 
+
+	$url = array('../wp-content/plugins/copingblog/templates/phsz_feinplanungsraster_fachpraktikum_ohne_ref_ps.docx',
+				'https://intranet.phsz.ch/fileadmin/autoren/intranet_berufspraktische_studien/phsz_wochenplanung.docx',
+				'https://intranet.phsz.ch/fileadmin/autoren/intranet_berufspraktische_studien/phsz_grobplanung.docx'
+				);
+	$new = array('new_planung=1', 'new_planung=2', 'new_planung=3');
+	for($i=0; $i<3; $i++) {
+		echo '<h3>'.$title[$i].'</h3>';
+		echo "<a href='".$url[$i]."'>Formular herunterladen</a> | ";
+		echo "<a href='edit.php?post_status=all&post_type=post&cat=".$cat_ids[$i].
+			"&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[$i]) ? $ps_count[$i]->count : 0) .")</a> | ";
+		echo "<a href='post-new.php?".$new[$i]."'>neu</a><br><br>";
+	}
 }
 
 function cb_display_reflexionps() {
@@ -203,7 +217,7 @@ function cb_display_reflexionps() {
 } //end cb_display_feinplanung
 
 function cb_display_reflexion() {
-	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_080_retweet.png">'.' Reflexion</h2>';
+	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_080_retweet.png">'.' Bloggen</h2>';
 	$group = cb_get_user_experimental_group();
 	if ( $group == CB_GROUP_EF || $group == CB_GROUP_EF_FB ) { 
 		echo "<div><ol>";
@@ -240,9 +254,9 @@ function cb_menu_copingblog() {
 	$menu_blogpr = get_site_option( 'cb_menu_blogpr' );
 	if(isset($menu_blogpr) && $menu_blogpr==1) {
 		add_menu_page("Blogging Tool", "Blogging Tool", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung', CB_PLUGIN_URL.'/'.'icons/glyphicons_330_blog_invers.png');
-		add_submenu_page( "feinplanung_menu", "Feinplanung", "Feinplanung", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung');
+		add_submenu_page( "feinplanung_menu", "Planungsinstrumente", "Planungsinstrumente", "edit_posts", "feinplanung_menu", 'cb_display_feinplanung');
 		add_submenu_page( "feinplanung_menu", "Reflexion PS", "Reflexion PS", "edit_posts", "reflexionps_menu", 'cb_display_reflexionps');
-		if (cb_get_user_experimental_group() != CB_GROUP_CTRL) add_submenu_page( "feinplanung_menu", "Reflexion", "Reflexion", "edit_posts", "reflexion_menu", 'cb_display_reflexion');
+		if (cb_get_user_experimental_group() != CB_GROUP_CTRL) add_submenu_page( "feinplanung_menu", "Bloggen", "Bloggen", "edit_posts", "reflexion_menu", 'cb_display_reflexion');
 		add_submenu_page( "feinplanung_menu", "Evaluation", "Evaluation", "edit_posts", "evaluation_menu", 'cb_display_evaluation');
 	}
 
@@ -365,7 +379,9 @@ function cb_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
 	wp_create_category( 'Reflexion' );
 	
 	wp_create_category( 'Feinplanung' );
-
+	wp_create_category( 'Wochenplanung' );
+	wp_create_category( 'Grobplanung' );
+	
 	//sitebar categories widget active
 	delete_option('sidebars_widgets');
 /*	$sw = get_option('sidebars_widgets');
