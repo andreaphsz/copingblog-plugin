@@ -248,7 +248,16 @@ function cb_display_evaluation() {
 	echo "<a href='http://fragebogen.blogpraktikum.ch' target=_blank>Link zum Fragebogen</a>";
 }
 
-add_action('admin_menu', 'cb_menu_copingblog');
+//add_action('admin_menu', 'cb_menu_copingblog');
+add_action('admin_menu', 'cb_menu_copingblog_minimal');
+
+function cb_menu_copingblog_minimal() {
+	$menu_blogpr = get_site_option( 'cb_menu_blogpr' );
+	if(isset($menu_blogpr) && $menu_blogpr==1) {
+		if (cb_get_user_experimental_group() != CB_GROUP_CTRL) add_menu_page( "Bloggen", "Bloggen", "edit_posts", "reflexion_menu", 'cb_display_reflexion', CB_PLUGIN_URL.'/'.'icons/glyphicons_330_blog_invers.png');
+	}
+
+}
 
 function cb_menu_copingblog() {
 	$menu_blogpr = get_site_option( 'cb_menu_blogpr' );
