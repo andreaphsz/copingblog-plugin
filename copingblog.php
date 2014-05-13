@@ -39,17 +39,19 @@ function cb_editor_content( $content ) {
 		);
 		if ($group_type == CB_GROUP_EF || $group_type == CB_GROUP_EF_FB) {
 			$content  = $img_1 . $img_2[$group_type];
-			$content .= "1) Situationsbeschreibung <br>";
-			$content .= "2) Denkweisen ausprobieren <br>";
-			$content .= "3) Neue Situationsbewertung <br>";
+			$content .= "<br> 1) Situationsbeschreibung <br>";
+			$content .= "<br> 2) Denkweisen ausprobieren <br>";
+			$content .= "<br> 3) Neue Situationsbewertung <br>";
 		}
 		if ($group_type == CB_GROUP_PF || $group_type == CB_GROUP_PF_FB) {
 			$content  = $img_1 . $img_2[$group_type];			
-			$content .= "1) Problemanalyse <br>";
-			$content .= "2) Ideensammlung <br>";
-			$content .= "3) Problemlösestrategie <br>";
+			$content .= "<br> 1) Problemanalyse <br>";
+			$content .= "<br> 2) Ideensammlung <br>";
+			$content .= "<br> 3) Idee auswählen <br>";
+			$content .= "<br> 4) Problemlösestrategie <br>";
+			$content .= "<br> 5) Im Alltag handeln und Bilanz ziehen <br>";
 		}
-		if ($new_refl == "pwd") $content .= "[Passwort für Kommilitone anpassen]" ;
+		if ($new_refl == "pwd") $content .= "<br>[Passwort für Kommilitone anpassen]" ;
 		
 	}
 
@@ -230,9 +232,11 @@ function cb_display_reflexion() {
 	if ( $group == CB_GROUP_PF  ||  $group == CB_GROUP_PF_FB ) { 
 		echo "<div><ol>";
 		echo "<li>".CB_PF_REFLEXION_HTML_1."</li>";
-		echo "<li>".CB_PF_REFLEXION_HTML_2."</li>";	
-		echo "<li>".CB_PF_REFLEXION_HTML_3."</li>";		
-		if ($group == CB_GROUP_PF_FB) echo "<li>".CB_PF_REFLEXION_HTML_4."</li>";
+		echo "<li>".CB_PF_REFLEXION_HTML_2."</li>";
+		echo "<li>".CB_PF_REFLEXION_HTML_3."</li>";
+		echo "<li>".CB_PF_REFLEXION_HTML_4."</li>";
+		echo "<li>".CB_PF_REFLEXION_HTML_5."</li>";
+		if ($group == CB_GROUP_PF_FB) echo "<li>".CB_PF_REFLEXION_HTML_6."</li>";
 		echo "</ol></div>";
 	}
 	
@@ -240,7 +244,7 @@ function cb_display_reflexion() {
 	$ps_count = get_categories( array('include'=> $cat_ids) ); 
 	
 	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Reflexion' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_reflexion=".($group==CB_GROUP_EF_FB ? "pwd" : "private")."'>neu</a><br><br>";
+	echo "<a href='post-new.php?new_reflexion=".($group==CB_GROUP_EF_FB || $group==CB_GROUP_PF_FB ? "pwd" : "private")."'>neu</a><br><br>";
 }
 
 function cb_display_evaluation() {
@@ -377,30 +381,20 @@ function cb_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
  
 	// Change to a different theme
 	switch_theme( 'Blogpraktikum' );
- 
 	
-	//$parent_id = wp_create_category( 'Professionsstandards' );
-	
+	wp_create_category( 'Reflexion' );
+	/* 
 	for ($i=1; $i<10; $i++) {
 		wp_create_category( 'PS'.$i );
 	}
-
-	wp_create_category( 'Reflexion' );
 	
 	wp_create_category( 'Feinplanung' );
 	wp_create_category( 'Wochenplanung' );
 	wp_create_category( 'Grobplanung' );
+	*/
 	
 	//sitebar categories widget active
 	delete_option('sidebars_widgets');
-/*	$sw = get_option('sidebars_widgets');
-	$sw['wp_inactive_widgets'] = $sw['sidebar-1'];
-	$sw['sidebar-1'] = array(0 => 'categories-3');
-	//unset($sw['wp_inactive_widgets'][array_keys($sw['wp_inactive_widgets'], 'categories-2')[0]]);
-	update_option('sidebars_widgets', $sw);
-	update_option( 'widget_categories', array ( 3 => array ( 'title' => '', 'count' => 1, 'hierarchical' => 0, 'dropdown' => 0 ), '_multiwidget' => 1 ) );
-	//update_option( 'sidebars_widgets', array ( 'wp_inactive_widgets' => array (), 'sidebar-1' => array ( 0 => 'search-2', 1 => 'recent-posts-2', 2 => 'recent-comments-2', 3 => 'archives-2', 4 => 'categories-2', 5 => 'meta-2', ), 'sidebar-2' => array (), 'sidebar-3' => array (), 'array_version' => 3 ) );
-*/	
 	
 	// Restore to the current blog
 	restore_current_blog();
@@ -417,33 +411,25 @@ function cb_init() {
 	
 	if ( !defined( 'CB_PLUGIN_URL' ) )  define( 'CB_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 	
-	if ( !defined( 'CB_EF_REFLEXION_HTML_1' ) )     define( 'CB_EF_REFLEXION_HTML_1', "<strong>Situationsbeschreibung</strong> <br> Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, wie Sie über diese Situation denken und welche Bedeutung sie für Sie hat. <br> (Dabei kann es sich um eine für Sie besonders stressige Ausnahmesituation handeln oder um eine alltägliche Kleinigkeit)." );
+	if ( !defined( 'CB_EF_REFLEXION_HTML_1' ) )     define( 'CB_EF_REFLEXION_HTML_1', "<strong>Situationsbeschreibung</strong> <br> Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, wie Sie über diese Situation denken und welche Bedeutung sie für Sie hat." );
 	
-	if ( !defined( 'CB_EF_REFLEXION_HTML_2' ) )     define( 'CB_EF_REFLEXION_HTML_2', "<strong>Denkweisen ausprobieren</strong> <br> Überlegen Sie anhand der folgenden Leitfragen, wie Sie auch über die Situation denken könnten und schreiben Sie das auf: <br>
-	a. Ist es wirklich so oder gibt es auch andere Möglichkeiten die Situation zu sehen?<br>
-	b. Was ist das Gute an dieser Situation und was kann ich daraus lernen?<br>
-	c. Welche Stärken und Ressourcen habe ich, die mir in dieser Situation helfen?<br>
-	d. Wie werde ich darüber denken, wenn ich mehr Distanz zur Situation bekomme? (z.B. in einem Jahr)<br>");
+	if ( !defined( 'CB_EF_REFLEXION_HTML_2' ) )     define( 'CB_EF_REFLEXION_HTML_2', "<strong>Denkweisen ausprobieren</strong> <br> Überlegen Sie, wie Sie anders über die Situation denken könnten. Was ist das Gute an dieser Situation und welche Stärken und Ressourcen haben Sie?");
 
-	if ( !defined( 'CB_EF_REFLEXION_HTML_3' ) )     define( 'CB_EF_REFLEXION_HTML_3', "<strong>Neue Situationsbewertung</strong> <br> 
-Formulieren Sie eine für Sie förderliche Denkweise, die Ihnen hilft, mit der Situation in positiver Weise umzugehen. Formulieren Sie Ihre Denkweise möglichst kurz und einfach, persönlich und in der Gegenwart.");
+	if ( !defined( 'CB_EF_REFLEXION_HTML_3' ) )     define( 'CB_EF_REFLEXION_HTML_3', "<strong>Neue Situationsbewertung</strong> <br> Formulieren Sie eine für Sie förderliche Denkweise, die Ihnen hilft, mit der Situation in positiver Weise umzugehen.");
 
-	if ( !defined( 'CB_EF_REFLEXION_HTML_4' ) )     define( 'CB_EF_REFLEXION_HTML_4', "<i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie Sie deren/dessen geschilderte Denkweisen und Situationsbewertungen einschätzen. Achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i>");
+	if ( !defined( 'CB_EF_REFLEXION_HTML_4' ) )     define( 'CB_EF_REFLEXION_HTML_4', "<i>Social Blogging (mit Peerfeedback) <br> Lesen Sie mindestens einen aktuellen Beitrag von einem Kollegen oder einer Kollegin und schreiben Sie einen kurzen Kommentar. Geben Sie Feedback oder Hinweise und unterstützen Sie sich gegenseitig.</i>");
 	
-	if ( !defined( 'CB_PF_REFLEXION_HTML_1' ) )     define( 'CB_PF_REFLEXION_HTML_1', "<strong>Problemanalyse</strong> <br>
-		Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, welche Gründe zu dieser Situation geführt haben. <br> (Dabei kann es sich um eine für Sie besonders stressige Ausnahmesituation handeln oder um eine alltägliche Kleinigkeit).");
+	if ( !defined( 'CB_PF_REFLEXION_HTML_1' ) )     define( 'CB_PF_REFLEXION_HTML_1', "<strong>Problemanalyse</strong> <br> Beschreiben Sie eine Situation im Praktikum, die Sie heute als Herausforderung oder als Belastung erlebt haben und erklären Sie, welche Aspekte in dieser Situation zusammenspielen.");
 
-	if ( !defined( 'CB_PF_REFLEXION_HTML_2' ) )     define( 'CB_PF_REFLEXION_HTML_2', "<strong>Ideensammlung</strong> <br>
-Überlegen Sie anhand der folgenden Leitfragen, wie Sie die geschilderte Herausforderung künftig vermeiden, verändern, bewältigen könnten und schreiben Sie das stichwortartig auf: <br>
-	a.	Auf welche Aspekte der Situation habe ich Einfluss und auf welche nicht? <br>
-	b.	Welche Aspekte sind wichtiger und welche sind weniger entscheidend? <br>
-	c.	Welche Bedingungen kann ich im Vorfeld dieser Situation beeinflussen? <br>
-	d.	Welche Verhaltensmöglichkeiten habe ich, wenn die Situation akut auftritt?");
+	if ( !defined( 'CB_PF_REFLEXION_HTML_2' ) )     define( 'CB_PF_REFLEXION_HTML_2', "<strong>Ideensammlung</strong> <br> Überlegen Sie sich verschiedene Strategien, wie Sie die geschilderte Herausforderung künftig vermeiden, verändern, bewältigen könnten und schreiben Sie das stichwortartig auf. Seien Sie kreativ.");
 
-	if ( !defined( 'CB_PF_REFLEXION_HTML_3' ) )     define( 'CB_PF_REFLEXION_HTML_3', "<strong>Problemlösestrategie</strong> <br>
-Skizzieren Sie einen für Sie passenden Plan zur Lösung des Problems; nennen Sie dazu Ihre konkreten Handlungsschritte. Notiere Sie auch die Konsequenzen, die Sie von Ihrem Plan erwarten, wenn die Situation erneut auftreten sollte.");
+	if ( !defined( 'CB_PF_REFLEXION_HTML_3' ) )     define( 'CB_PF_REFLEXION_HTML_3', "<strong>Idee auswählen</strong> <br> Welche Aspekte der Situation können Sie beeinflussen und welche nicht? Welche sind wichtig und welche weniger entscheidend?");
+	
+	if ( !defined( 'CB_PF_REFLEXION_HTML_4' ) )     define( 'CB_PF_REFLEXION_HTML_4', "<strong>Problemlösestrategie</strong> <br> Wählen Sie die Strategie, die für Sie am besten passt und beschreiben Sie die konkreten Handlungsschritt, die Sie nun umsetzen wollen.");
 
-	if ( !defined( 'CB_PF_REFLEXION_HTML_4' ) )     define( 'CB_PF_REFLEXION_HTML_4', "<i>Social Blogging (mit Peerfeedback): Lesen Sie mindestens einen aktuellen Beitrag von anderen aus Ihrer Gruppe und schreiben Sie einen ehrlichen Kommentar, wie gut Sie die Chancen einschätzen, mit der geschilderten Problemanalyse und Problemlösestrategie Erfolg zu haben. Geben Sie Hinweise, was man noch tun könnte und achten Sie darauf, konstruktiv und unterstützend zu schreiben.</i>");
+	if ( !defined( 'CB_PF_REFLEXION_HTML_5' ) )     define( 'CB_PF_REFLEXION_HTML_5', "<strong>Im Alltag handeln und Bilanz ziehen</strong> <br> Im nächsten Blogeintrag sollten Sie dann kurz beschreiben, ob Sie mit Ihrer Strategie erfolgreich waren. Was hat gut funktioniert und was weniger? Warum?");
+
+	if ( !defined( 'CB_PF_REFLEXION_HTML_6' ) )     define( 'CB_PF_REFLEXION_HTML_6', "<i>Social Blogging (mit Peerfeedback) <br> Lesen Sie mindestens einen aktuellen Beitrag von einem Kollegen oder einer Kollegin und schreiben Sie einen kurzen Kommentar. Geben Sie Feedback oder Hinweise und unterstützen Sie sich gegenseitig.</i>");
 
 	if ( !defined( 'CB_PS1_HTML' ) )     define( 'CB_PS1_HTML', 'Die Lehrperson verfügt über fachwissenschaftliches und fachdidaktisches Wissen, versteht die Inhalte, Strukturen und zentralen Forschungsmethoden ihrer Fachbereiche und sie kann Lern- situationen schaffen, die die fachwissenschaftlichen und fachdidaktischen Aspekte für die Lernenden bedeutsam machen. <br>
 	&nbsp;&nbsp;1.3 erkennt Zusammenhänge zwischen verschiedenen Fachbereichen (Niveau 1) <br>
