@@ -219,6 +219,8 @@ function cb_display_reflexionps() {
 } //end cb_display_feinplanung
 
 function cb_display_reflexion() {
+    global $wpdb;
+
 	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_080_retweet.png">'.' Bloggen</h2>';
 	$group = cb_get_user_experimental_group();
 	if ( $group == CB_GROUP_EF || $group == CB_GROUP_EF_FB ) { 
@@ -243,8 +245,9 @@ function cb_display_reflexion() {
 	$cat_ids =  get_cat_ID('Reflexion');
 	$ps_count = get_categories( array('include'=> $cat_ids) ); 
 	
-	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Reflexion' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
-	echo "<a href='post-new.php?new_reflexion=".($group==CB_GROUP_EF_FB || $group==CB_GROUP_PF_FB ? "pwd" : "private")."'>neu</a><br><br>";
+	//echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Reflexion' )."&paged=1&mode=excerpt'>anzeigen (". (isset($ps_count[0]) ? $ps_count[0]->count : 0) .")</a> | ";
+	echo "<a href='edit.php?post_status=all&post_type=post&cat=".get_cat_ID( 'Reflexion' )."&paged=1&mode=excerpt'><img src='".CB_PLUGIN_URL.'/'."icons/glyphicons_195_circle_info_small.png'></a>&nbsp;&nbsp;";
+	echo "<a href='post-new.php?new_reflexion=".($group==CB_GROUP_EF_FB || $group==CB_GROUP_PF_FB ? "pwd" : "private")."'><img src='".CB_PLUGIN_URL.'/'."icons/glyphicons_190_circle_plus_small.png'></a><br><br>";
 }
 
 function cb_display_evaluation() {
