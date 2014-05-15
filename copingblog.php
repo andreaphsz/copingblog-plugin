@@ -380,7 +380,7 @@ function cb_new_blog( $blog_id, $user_id, $domain, $path, $site_id, $meta ) {
 	switch_to_blog( $blog_id );
  
 	// Change to a different theme
-	switch_theme( 'Blogpraktikum' );
+	//switch_theme( 'Blogpraktikum' );
 	
 	wp_create_category( 'Reflexion' );
 	/* 
