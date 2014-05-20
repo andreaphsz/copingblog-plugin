@@ -264,6 +264,50 @@ function cb_display_evaluation() {
 	echo "<a href='http://fragebogen.blogpraktikum.ch' target=_blank>Link zum Fragebogen</a>";
 }
 
+function cb_display_adminbereich() {
+	if(cb_get_user_experimental_group() != CB_GROUP_ADMIN) return;
+	
+	global $wpdb;
+	
+	echo "<div style='background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;'><table class='wp-list-table widefat'>";
+	
+	if(!isset($_GET["userid"])) {
+		echo "<thead><tr><th width='300px'>email</th><th width='50px'>gruppe</th><th>posts</th></tr></thead>";
+		
+		$rows = $wpdb->get_results( "SELECT a.ID, a.user_email, b.group, c.meta_value FROM `wp_users` as a RIGHT JOIN cb_students as b ON a.user_email=b.email LEFT JOIN wp_usermeta as c ON c.user_id = a.ID WHERE c.meta_key='primary_blog' ORDER BY b.group ");
+
+		foreach($rows as $row) {
+			$pcount = $wpdb->get_results( "SELECT COUNT(a.ID) FROM wp_{$row->meta_value}_posts as a LEFT JOIN wp_{$row->meta_value}_term_relationships as b ON a.ID = b.object_id LEFT JOIN wp_{$row->meta_value}_terms as c ON b.term_taxonomy_id = c.term_id WHERE a.post_type='post' AND a.ID<>1 AND c.slug='reflexion' ", ARRAY_N );
+			echo "<tr>";
+			echo "<td><a href='admin.php?page=adminbereich_menu&userid=$row->ID'>" . $row->user_email . "</a></td>";
+			echo "<td>" . $row->group . "</td>";
+			echo "<td>" . $pcount[0][0] . "</td>";
+			echo "</tr>";
+		}
+	} else {
+		$userid = $_GET["userid"];
+	 	
+		echo "<thead><tr><th width='80px'>datum</th><th width='20%'>titel</th><th>inhalt</th></tr></thead>";
+	 	
+		$row = $wpdb->get_results( "SELECT c.meta_value FROM `wp_users` as a RIGHT JOIN cb_students as b ON a.user_email=b.email LEFT JOIN wp_usermeta as c ON c.user_id = a.ID WHERE c.meta_key='primary_blog' AND a.ID=$userid ", ARRAY_N);
+
+	 	$posts = $wpdb->get_results( "SELECT a.post_date, a.post_title, a.post_content FROM wp_{$row[0][0]}_posts as a LEFT JOIN wp_{$row[0][0]}_term_relationships as b ON a.ID = b.object_id LEFT JOIN wp_{$row[0][0]}_terms as c ON b.term_taxonomy_id = c.term_id WHERE a.post_type='post' AND a.ID<>1 AND c.slug='reflexion' ORDER BY a.post_date DESC ");
+
+		foreach($posts as $post) {
+	 		echo "<tr>";
+	 		echo "<td>" . $post->post_date . "</td>";
+	 		echo "<td>" . $post->post_title . "</td>";
+			//see http://stackoverflow.com/questions/1107194/php-remove-img-tag-from-string
+			$content = preg_replace("/<img[^>]+\>/i", "(image) ", $post->post_content); 
+			$content = preg_replace("/\n/i", "<br>", $content); 
+			echo "<td>" . $content . "</td>";
+	 		echo "</tr>";
+	 	}
+	 	
+	} //end if
+	echo "</table></div>";
+}
+
 //add_action('admin_menu', 'cb_menu_copingblog');
 add_action('admin_menu', 'cb_menu_copingblog_minimal');
 
@@ -271,6 +315,7 @@ function cb_menu_copingblog_minimal() {
 	$menu_blogpr = get_site_option( 'cb_menu_blogpr' );
 	if(isset($menu_blogpr) && $menu_blogpr==1) {
 		if (cb_get_user_experimental_group() != CB_GROUP_CTRL) add_menu_page( "Bloggen", "Bloggen", "edit_posts", "reflexion_menu", 'cb_display_reflexion', CB_PLUGIN_URL.'/'.'icons/glyphicons_330_blog_invers.png');
+		if(cb_get_user_experimental_group() == CB_GROUP_ADMIN) add_submenu_page( "reflexion_menu", "Adminbereich", "Adminbereich", "edit_posts", "adminbereich_menu", 'cb_display_adminbereich');
 	}
 
 }
@@ -420,6 +465,7 @@ function cb_init() {
 	if ( !defined( 'CB_GROUP_PF' ) )    define( 'CB_GROUP_PF', 'pf');
 	if ( !defined( 'CB_GROUP_PF_FB' ) ) define( 'CB_GROUP_PF_FB', 'pf_fb');
 	if ( !defined( 'CB_GROUP_CTRL' ) )  define( 'CB_GROUP_CTRL', 'ctrl');
+	if ( !defined( 'CB_GROUP_ADMIN' ) )  define( 'CB_GROUP_ADMIN', 'admin');
 	
 	if ( !defined( 'CB_PLUGIN_URL' ) )  define( 'CB_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 	
