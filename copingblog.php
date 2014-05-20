@@ -18,6 +18,15 @@ function cb_get_user_experimental_group() {
 	return $group['group'];
 }
 
+function cb_get_user_subgroup_password() {
+    global $wpdb, $user_email;
+    get_currentuserinfo();
+
+	$lgpwd = $wpdb->get_row("SELECT * FROM cb_students WHERE email='$user_email' ", ARRAY_A);
+
+	return $lgpwd['lgpwd'];
+}
+
 add_filter('default_content', 'cb_editor_content');
 
 function cb_editor_content( $content ) {
@@ -51,7 +60,7 @@ function cb_editor_content( $content ) {
 			$content .= "<br> 4) Problemlösestrategie <br>";
 			$content .= "<br> 5) Im Alltag handeln und Bilanz ziehen <br>";
 		}
-		if ($new_refl == "pwd") $content .= "<br>[Passwort für Kommilitone anpassen]" ;
+		//if ($new_refl == "pwd") $content .= "<br>[Passwort für Kommilitone anpassen]" ;
 		
 	}
 
@@ -99,7 +108,7 @@ function cb_save_post( $post_id ){
 		$refl = get_cat_ID( 'Reflexion' );
 		wp_set_post_categories( $post_id, array($refl));
 		if($new_refl == "pwd") {
-			cb_update_post($post_id, array( 'post_password' => 'for_my_fellow_'.rand(1000,9999), 'ID' => $post_id ));
+			cb_update_post($post_id, array( 'post_password' => cb_get_user_subgroup_password(), 'ID' => $post_id ));
 		}
 		if($new_refl == "private") {
 			cb_update_post($post_id, array( 'post_status' => 'private', 'ID' => $post_id ));
