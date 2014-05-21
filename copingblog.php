@@ -271,9 +271,12 @@ function cb_display_adminbereich() {
 	
 	global $wpdb;
 	
-	echo "<div style='background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;'><table class='wp-list-table widefat'>";
+	echo '<h2><img src="'.CB_PLUGIN_URL.'/'.'icons/glyphicons_086_display.png">'.' Adminbereich</h2>';
+	
+	echo "<div style='background:#ECECEC;border:1px solid #CCC;padding:0 10px;margin-top:5px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;'>";
 	
 	if(!isset($_GET["userid"])) {
+		echo "<table class='wp-list-table widefat'>";
 		echo "<thead><tr><th width='300px'>email</th><th width='50px'>gruppe</th><th>posts</th></tr></thead>";
 		
 		$rows = $wpdb->get_results( "SELECT a.ID, a.user_email, b.group, c.meta_value FROM `wp_users` as a RIGHT JOIN cb_students as b ON a.user_email=b.email LEFT JOIN wp_usermeta as c ON c.user_id = a.ID WHERE c.meta_key='primary_blog' ORDER BY b.group ");
@@ -288,7 +291,11 @@ function cb_display_adminbereich() {
 		}
 	} else {
 		$userid = $_GET["userid"];
-	 	
+		$user_info = get_userdata( $userid );
+		echo "<h3>" . $user_info->user_email . " " . $user_info->display_name."</h3>";
+		
+		echo "<table class='wp-list-table widefat'>";
+			 	
 		echo "<thead><tr><th width='80px'>datum</th><th width='20%'>titel</th><th>inhalt</th></tr></thead>";
 	 	
 		$row = $wpdb->get_results( "SELECT c.meta_value FROM `wp_users` as a RIGHT JOIN cb_students as b ON a.user_email=b.email LEFT JOIN wp_usermeta as c ON c.user_id = a.ID WHERE c.meta_key='primary_blog' AND a.ID=$userid ", ARRAY_N);
