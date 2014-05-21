@@ -47,18 +47,20 @@ function cb_editor_content( $content ) {
 			CB_GROUP_PF_FB => 'pf_fb.png"  />'			
 		);
 		if ($group_type == CB_GROUP_EF || $group_type == CB_GROUP_EF_FB) {
-			$content  = $img_1 . $img_2[$group_type];
-			$content .= "<br> 1) Situationsbeschreibung <br>";
-			$content .= "<br> 2) Denkweisen ausprobieren <br>";
-			$content .= "<br> 3) Neue Situationsbewertung <br>";
+			//$content  = $img_1 . $img_2[$group_type];
+			$content = "";
+			$content .= "<br> 1) Situationsbeschreibung: Was haben Sie als Herausforderung erlebt? <br>";
+			$content .= "<br> 2) Denkweisen ausprobieren: Wie könnte man das anders sehen? Was ist positiv? <br>";
+			$content .= "<br> 3) Neue Situationsbewertung: Wie sehen Sie es jetzt? <br>";
 		}
 		if ($group_type == CB_GROUP_PF || $group_type == CB_GROUP_PF_FB) {
-			$content  = $img_1 . $img_2[$group_type];			
-			$content .= "<br> 1) Problemanalyse <br>";
-			$content .= "<br> 2) Ideensammlung <br>";
-			$content .= "<br> 3) Idee auswählen <br>";
-			$content .= "<br> 4) Problemlösestrategie <br>";
-			$content .= "<br> 5) Im Alltag handeln und Bilanz ziehen <br>";
+			//$content  = $img_1 . $img_2[$group_type];
+			$content = "";
+			$content .= "<br> 1) Problemanalyse: Was war heute eine Herausforderung und warum? <br>";
+			$content .= "<br> 2) Ideensammlung: Auf welche Weisen könnte man damit umgehen? <br>";
+			$content .= "<br> 3) Idee auswählen: Welcher Ansatz wäre besser, welcher schlechter? <br>";
+			$content .= "<br> 4) Problemlösestrategie: Was werden Sie tun? <br>";
+			$content .= "<br> 5) Im Alltag handeln und Bilanz ziehen: Wie ist es Ihnen ergangen? <br>";
 		}
 		//if ($new_refl == "pwd") $content .= "<br>[Passwort für Kommilitone anpassen]" ;
 		
