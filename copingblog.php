@@ -300,7 +300,7 @@ function cb_display_adminbereich() {
 	 	
 		$row = $wpdb->get_results( "SELECT c.meta_value FROM `wp_users` as a RIGHT JOIN cb_students as b ON a.user_email=b.email LEFT JOIN wp_usermeta as c ON c.user_id = a.ID WHERE c.meta_key='primary_blog' AND a.ID=$userid ", ARRAY_N);
 
-	 	$posts = $wpdb->get_results( "SELECT a.post_date, a.post_title, a.post_content FROM wp_{$row[0][0]}_posts as a LEFT JOIN wp_{$row[0][0]}_term_relationships as b ON a.ID = b.object_id LEFT JOIN wp_{$row[0][0]}_terms as c ON b.term_taxonomy_id = c.term_id WHERE a.post_type='post' AND a.ID<>1 AND c.slug='reflexion' AND a.post_status<>'trash' ORDER BY a.post_date DESC ");
+	 	$posts = $wpdb->get_results( "SELECT a.ID, a.post_date, a.post_title, a.post_content FROM wp_{$row[0][0]}_posts as a LEFT JOIN wp_{$row[0][0]}_term_relationships as b ON a.ID = b.object_id LEFT JOIN wp_{$row[0][0]}_terms as c ON b.term_taxonomy_id = c.term_id WHERE a.post_type='post' AND a.ID<>1 AND c.slug='reflexion' AND a.post_status<>'trash' ORDER BY a.post_date DESC ");
 
 		foreach($posts as $post) {
 	 		echo "<tr>";
@@ -311,6 +311,17 @@ function cb_display_adminbereich() {
 			$content = preg_replace("/\n/i", "<br>", $content); 
 			echo "<td>" . $content . "</td>";
 	 		echo "</tr>";
+			$comments = get_comments('post_id='.$post->ID);
+			foreach($comments as $comment) :
+				echo "<tr style='background-color: #B4B4B4;'><td>";
+				echo $comment->comment_date;
+				echo "</td><td>";
+				echo $comment->comment_author_email;
+				echo "</td><td>";
+				echo $comment->comment_content;
+				echo "</td>";
+				echo "</tr>";
+			endforeach;
 	 	}
 	 	
 	} //end if
