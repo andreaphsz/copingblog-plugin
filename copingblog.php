@@ -279,7 +279,7 @@ function cb_display_adminbereich() {
 		echo "<table class='wp-list-table widefat'>";
 		echo "<thead><tr><th width='300px'>email</th><th width='50px'>gruppe</th><th>posts</th></tr></thead>";
 		
-		$rows = $wpdb->get_results( "SELECT a.ID, a.user_email, b.group, c.meta_value FROM `wp_users` as a RIGHT JOIN cb_students as b ON a.user_email=b.email LEFT JOIN wp_usermeta as c ON c.user_id = a.ID WHERE c.meta_key='primary_blog' ORDER BY b.group ");
+		$rows = $wpdb->get_results( "SELECT a.ID, a.user_email, b.group, c.meta_value FROM `wp_users` as a RIGHT JOIN cb_students as b ON a.user_email=b.email LEFT JOIN wp_usermeta as c ON c.user_id = a.ID WHERE c.meta_key='primary_blog' ORDER BY b.group, a.user_email ");
 
 		foreach($rows as $row) {
 			$pcount = $wpdb->get_results( "SELECT COUNT(a.ID) FROM wp_{$row->meta_value}_posts as a LEFT JOIN wp_{$row->meta_value}_term_relationships as b ON a.ID = b.object_id LEFT JOIN wp_{$row->meta_value}_terms as c ON b.term_taxonomy_id = c.term_id WHERE a.post_type='post' AND a.ID<>1 AND c.slug='reflexion' AND a.post_status<>'trash' ", ARRAY_N );
