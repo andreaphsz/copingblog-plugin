@@ -311,7 +311,8 @@ function cb_display_adminbereich() {
 			$content = preg_replace("/\n/i", "<br>", $content); 
 			echo "<td>" . $content . "</td>";
 	 		echo "</tr>";
-			$comments = get_comments('post_id='.$post->ID);
+			switch_to_blog( $row[0][0] );
+			$comments = get_comments(array('post_id'=>$post->ID));
 			foreach($comments as $comment) :
 				echo "<tr style='background-color: #B4B4B4;'><td>";
 				echo $comment->comment_date;
@@ -322,6 +323,7 @@ function cb_display_adminbereich() {
 				echo "</td>";
 				echo "</tr>";
 			endforeach;
+			restore_current_blog();
 	 	}
 	 	
 	} //end if
